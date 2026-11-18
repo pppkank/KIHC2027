@@ -298,9 +298,9 @@ input:focus,select:focus{outline:2px solid var(--gold);outline-offset:0;border-c
 /* contact/footer */
 .contact{display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:end}
 .contact > *{min-width:0}
-.contact dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:10px 18px}
+.contact dl{margin:0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px 18px}
 .contact dt{font-family:var(--f-mono);font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);padding-top:3px}
-.contact dd{margin:0}
+.contact dd{margin:0;min-width:0;overflow-wrap:anywhere}
 @media (max-width:760px){.contact{grid-template-columns:1fr}}
 footer{background:#0d2422;color:#cfdcd8;font-size:.88rem}
 footer .wrap{padding-block:36px;display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between;align-items:center}
@@ -393,6 +393,19 @@ dialog.legal::backdrop{background:rgba(6,22,21,.6)}
 .agree a{color:var(--teal)}
 .foot-links{display:flex;flex-wrap:wrap;gap:6px}
 .foot-links a{color:#f0d79c}
+/* explore */
+.ex-filter{display:flex;flex-wrap:wrap;gap:8px;margin-top:28px}
+.ex-filter button{border:1px solid var(--line);background:var(--surface);color:var(--ink-soft);font:600 .86rem var(--f-body);padding:8px 14px;border-radius:999px;cursor:pointer}
+.ex-filter button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.ex-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:22px}
+.ex-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px 22px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.ex-card .cat{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.ex-card h3{font-family:var(--f-display);font-weight:600;font-size:1.35rem;line-height:1.2}
+.ex-card p{font-size:.92rem;color:var(--ink-soft)}
+.ex-card .info{margin-top:auto;padding-top:8px;border-top:1px dashed var(--line);font-family:var(--f-mono);font-size:.74rem;color:var(--teal)}
+.ex-card.near{border-color:var(--teal);box-shadow:inset 0 3px 0 var(--teal)}
+@media (max-width:900px){.ex-grid{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.ex-grid{grid-template-columns:1fr}}
 .star-rule{display:flex;align-items:center;gap:14px;color:var(--gold);margin-top:22px}
 .star-rule::before,.star-rule::after{content:"";height:1px;flex:1;background:var(--line)}
 .star-rule svg{width:16px;height:16px}
@@ -434,6 +447,7 @@ dialog.legal::backdrop{background:rgba(6,22,21,.6)}
       <a href="#programme" data-i18n="nav.programme">Programme</a>
       <a href="#highlights" data-i18n="nav.highlights">Highlights</a>
       <a href="#venue" data-i18n="nav.venue">Venue</a>
+      <a href="#explore" data-i18n="nav.explore">Explore</a>
       <a href="#register" data-i18n="nav.register">Registration</a>
       <a href="#sponsors" data-i18n="nav.sponsors">Sponsors</a>
       <a href="#contact" data-i18n="nav.contact">Contact</a>
@@ -629,6 +643,23 @@ dialog.legal::backdrop{background:rgba(6,22,21,.6)}
         <li><svg><use href="#i-bed"/></svg><div><b data-i18n="tr.stay">Accommodation</b><span class="muted small" data-i18n="tr.stay.p">A list of partner hotels and conference rates will be published here.</span></div></li>
       </ul>
     </div>
+  </div>
+</section>
+
+<section class="band" id="explore">
+  <div class="wrap">
+    <p class="eyebrow"><svg><use href="#star"/></svg><span data-i18n="ex.eye">Explore Alor Setar</span></p>
+    <h2 class="sec-title" data-i18n-html="ex.title">Stay a little <em>longer</em></h2>
+    <p class="lede" data-i18n="ex.lede">The conference ends on a Thursday. Spend Friday or the weekend in Kedah's royal capital, the heart of Malaysia's rice bowl.</p>
+    <div class="ex-filter" role="group" aria-label="Filter places">
+      <button type="button" data-f="all" aria-pressed="true" data-i18n="ex.f.all">All</button>
+      <button type="button" data-f="heritage" aria-pressed="false" data-i18n="ex.f.heritage">Heritage &amp; royal</button>
+      <button type="button" data-f="city" aria-pressed="false" data-i18n="ex.f.city">City &amp; food</button>
+      <button type="button" data-f="nature" aria-pressed="false" data-i18n="ex.f.nature">Rice &amp; nature</button>
+      <button type="button" data-f="beyond" aria-pressed="false" data-i18n="ex.f.beyond">Beyond Alor Setar</button>
+    </div>
+    <div class="ex-grid" id="ex-grid"></div>
+    <p class="note"><svg width="18" height="18" style="flex:none;color:var(--gold);margin-top:3px"><use href="#star"/></svg><span data-i18n-html="ex.note"><b>Plan ahead.</b> Most museums close on Friday from 12.30pm to 2.30pm for prayers. Hours and prices may change, so check before you go.</span></p>
   </div>
 </section>
 
@@ -910,6 +941,13 @@ const TIERS=[
 function renderTiers(){
   document.getElementById("tiers").innerHTML=TIERS.map(x=>{const d=x[lang]||x.en;return `<article class="tier ${x.k}${x.big?" big":""}" style="--m:${x.m}"><div class="tier-head"><span class="metal"><i></i>${esc(d[0])}</span><span class="price">${x.price}</span></div><h3>${esc(d[1])}</h3><p class="sub">${esc(d[2])}</p><ul>${d[3].map(b=>`<li>${esc(b)}</li>`).join("")}</ul></article>`}).join("");
 }
+const PLACES=[{"c": "heritage", "en": ["Masjid Al-Bukhary", "A grand mosque blending Turkish, Persian and Egyptian design, beside the AIU campus.", "Next to the venue"], "ms": ["Masjid Al-Bukhary", "Masjid besar berseni bina Turki, Parsi dan Mesir, bersebelahan kampus AIU.", "Bersebelahan lokasi"]}, {"c": "heritage", "en": ["Kedah Royal Museum", "The former royal palace, now a museum of Kedah's royal regalia and history.", "Free · 9am–5pm · Fri closed 12.30–2.30pm"], "ms": ["Muzium Diraja Kedah", "Bekas istana diraja yang kini menempatkan alat kebesaran dan sejarah diraja Kedah.", "Percuma · 9 pagi–5 ptg · Jumaat tutup 12.30–2.30 ptg"]}, {"c": "heritage", "en": ["Masjid Zahir & Dataran", "Kedah's century-old state mosque with five black domes, facing the royal Balai Besar and Balai Nobat.", "Balai Besar & Balai Nobat: exterior only"], "ms": ["Masjid Zahir & Dataran", "Masjid negeri berusia lebih 100 tahun dengan lima kubah hitam, berhadapan Balai Besar dan Balai Nobat.", "Balai Besar & Balai Nobat: luaran sahaja"]}, {"c": "heritage", "en": ["Kota Kuala Kedah", "A fort built in 1771 at the mouth of the Kedah River, followed by famous mee udang nearby.", "Free · Fri closed 12.30–2.30pm"], "ms": ["Kota Kuala Kedah", "Kubu tahun 1771 di muara Sungai Kedah. Cuba mee udang Kuala Kedah yang terkenal di sekitarnya.", "Percuma · Jumaat tutup 12.30–2.30 ptg"]}, {"c": "heritage", "en": ["Rumah Merdeka & Mahathir's birthplace", "The homes of two Malaysian Prime Ministers, Tunku Abdul Rahman and Tun Dr Mahathir Mohamad.", "Birthplace closed Mondays"], "ms": ["Rumah Merdeka & Rumah Kelahiran Mahathir", "Rumah dua Perdana Menteri Malaysia, Tunku Abdul Rahman dan Tun Dr Mahathir Mohamad.", "Rumah kelahiran tutup hari Isnin"]}, {"c": "heritage", "en": ["State Museum & Art Gallery", "Kedah's history, manuscripts and crafts, and local art in an 1893 former courthouse.", "Free · Fri closed 12.30–2.30pm"], "ms": ["Muzium Negeri & Balai Seni Negeri", "Sejarah, manuskrip dan kraf Kedah, serta seni tempatan dalam bekas mahkamah tahun 1893.", "Percuma · Jumaat tutup 12.30–2.30 ptg"]}, {"c": "city", "en": ["Menara Alor Setar", "A 165.5 m tower with a 360° observation deck over the city and paddy fields.", "Adult RM12"], "ms": ["Menara Alor Setar", "Menara setinggi 165.5 m dengan dek pemerhatian 360° menghadap bandar dan sawah padi.", "Dewasa RM12"]}, {"c": "city", "en": ["Pekan Rabu", "Alor Setar's heritage market for Kedah snacks, batik and local produce.", "Open daily"], "ms": ["Pekan Rabu", "Pasar warisan Alor Setar untuk kuih Kedah, batik dan hasil tempatan.", "Dibuka setiap hari"]}, {"c": "city", "en": ["Chinatown, Wat Nikrodharam & Lorong Seni", "A short walk through old coffee shops, a Thai Buddhist temple and a mural lane.", "Free"], "ms": ["Pekan Cina, Wat Nikrodharam & Lorong Seni", "Jalan kaki santai melalui kedai kopi lama, kuil Buddha Siam dan lorong mural.", "Percuma"]}, {"c": "nature", "en": ["Muzium Padi", "The rice museum of Malaysia's 'rice bowl', with a rotating panoramic mural of paddy fields.", "Adult RM5 · Fri closed 12.30–2.30pm"], "ms": ["Muzium Padi", "Muzium padi negeri jelapang padi Malaysia, dengan mural panorama sawah yang berputar.", "Dewasa RM5 · Jumaat tutup 12.30–2.30 ptg"]}, {"c": "nature", "en": ["Gunung Keriang", "A limestone hill among the paddy fields with caves and a short summit hike.", "Lift not in service; best 7–9am"], "ms": ["Gunung Keriang", "Bukit batu kapur di tengah sawah dengan gua dan pendakian singkat ke puncak.", "Lif tidak beroperasi; terbaik 7–9 pagi"]}, {"c": "beyond", "en": ["Langkawi", "Extend your stay on the UNESCO Global Geopark island, a ferry ride from Kuala Kedah.", "Limited daily ferries; check schedule"], "ms": ["Langkawi", "Lanjutkan percutian ke pulau Geopark Global UNESCO, dengan feri dari Kuala Kedah.", "Feri harian terhad; semak jadual"]}];
+let exF="all";
+function renderPlaces(){
+  const lab={heritage:t("ex.f.heritage"),city:t("ex.f.city"),nature:t("ex.f.nature"),beyond:t("ex.f.beyond")};
+  document.getElementById("ex-grid").innerHTML=PLACES.filter(x=>exF==="all"||x.c===exF).map((x,i)=>{const d=x[lang]||x.en;return `<article class="ex-card${x.en[0]==="Masjid Al-Bukhary"?" near":""}"><span class="cat">${esc(lab[x.c])}</span><h3>${esc(d[0])}</h3><p>${esc(d[1])}</p><span class="info">${esc(d[2])}</span></article>`}).join("");
+}
+document.addEventListener("click",e=>{const b=e.target.closest(".ex-filter button");if(!b)return;exF=b.dataset.f;document.querySelectorAll(".ex-filter button").forEach(x=>x.setAttribute("aria-pressed",x===b));renderPlaces()});
 const T={
 en:{"tc.err":"Please read and agree to the Terms & Conditions, Refund Policy and Privacy Policy to continue.","cat.my":"Malaysian participant","cat.intl":"International participant","cat.day":"Day registration","cond.my":"Early or standard rate to be confirmed after the venue quotation is received","cond.intl":"Exchange rate and payment method to be confirmed","cond.stu":"Limited quota with valid student identification","cond.day":"If operationally feasible and approved","lunch.l":["One dedicated 45–60-minute educational lunch symposium","Delegates' lunch under an agreed catering allocation","Acknowledgement in the programme, on-screen branding and approved digital promotion","One standard booth and three delegate passes","Session attendance summary, where data is available"],"cat.spec":"Specialists & consultants","cat.spec.s":"Medical, dental & public health specialists","cat.mo":"Medical, dental & veterinary officers","cat.mo.s":"Including pharmacists & scientific officers","cat.ah":"Allied health & other officers","cat.ah.s":"Nurses, AMOs, EHOs, local authority & agency staff","cat.stu":"Student","cat.stu.s":"Full-time, with valid student ID",
 "t1.c":["Healthy Cities","Urban Health","Built Environment","Community Empowerment"],"t2.c":["Climate Change","Heat & Air Pollution","Water & Sanitation","Waste Management","Environmental Health"],"t3.c":["NCD","Mental Health","Healthy Ageing","Nutrition","Maternal & Child Health","Adolescent, Women's & Men's Health"],"t4.c":["Infectious Diseases","Zoonoses","Vector-borne Diseases","AMR","Disaster Risk Management","Emergency Preparedness"],"t5.c":["AI","Digital Health","Surveillance","Research","Smart Cities","Precision Public Health"],
@@ -943,7 +981,7 @@ ms:{"nav.sponsors":"Penaja","sp.eye":"Penajaan & pameran","sp.title":"Perkongsia
 "w.foyer":"Lobi utama","w.dewan":"Dewan Konvokesyen","w.expo":"Ruang pameran","w.halls":"Dewan 1–3","prog.note":"<b>Atur cara tentatif.</b> Tertakluk kepada kelulusan Jawatankuasa Saintifik KIHC 2027. Penceramah akan diumumkan.",
 "hl.eye":"Sorotan acara","hl.title":"Apa yang <em>menanti</em> anda","h1.h":"Ucaptama & sesi pleno","h1.p":"Tokoh kebangsaan dan antarabangsa dalam kesihatan awam, Satu Kesihatan dan kemampanan.","h2.h":"Forum rentas sektor","h2.p":"Agensi kesihatan, veterinar, alam sekitar, perancangan bandar dan bencana di satu pentas.","h3.h":"Sesi lisan & poster","h3.p":"Inovasi tempatan dan pengalaman pelaksanaan, dengan anugerah untuk karya terbaik.","h4.h":"Pameran","h4.p":"Industri, penyedia teknologi, agensi dan NGO mempamerkan penyelesaian.","h5.h":"Deklarasi Kedah","h5.p":"Komitmen bersama sektor, disusuli selepas persidangan.","h6.h":"Mata CPD & prosiding","h6.p":"Kertas yang diterima akan dipertimbangkan untuk Laporan Teknikal Kedah.",
 "g.1":"Kampus AIU, Alor Setar","g.3":"Arked pada waktu malam","g.4":"Halaman & air pancut bintang","g.5":"Laluan kekisi","g.6":"Kubah & pohon palma","g.7":"Plaza bintang lapan bucu","g.8":"Laluan berbaris pohon palma","g.9":"Dataran utama","g.10":"Boulevard utama",
-"venue.eye":"Lokasi","venue.lede":"Kampus dengan arked putih, kubah keemasan dan halaman berpola bintang di Alor Setar, ibu negeri Kedah. AIU menyertai KIHC 2027 sebagai penganjur bersama dan tuan rumah.","tr.air":"Udara","tr.air.p":"Lapangan Terbang Sultan Abdul Halim (Alor Setar) untuk penerbangan domestik; Lapangan Terbang Antarabangsa Pulau Pinang untuk sambungan antarabangsa.","tr.rail":"Kereta api","tr.rail.p":"Perkhidmatan KTM ETS ke stesen Alor Setar.","tr.stay":"Penginapan","tr.stay.p":"Senarai hotel rakan dan kadar persidangan akan diterbitkan di sini.",
+"ex.eye":"Teroka Alor Setar","ex.title":"Luangkan masa <em>lebih</em> lama","ex.lede":"Persidangan berakhir pada hari Khamis. Habiskan hari Jumaat atau hujung minggu di ibu negeri diraja Kedah, nadi jelapang padi Malaysia.","ex.f.all":"Semua","ex.f.heritage":"Warisan & diraja","ex.f.city":"Bandar & makanan","ex.f.nature":"Padi & alam","ex.f.beyond":"Luar Alor Setar","ex.note":"<b>Rancang awal.</b> Kebanyakan muzium ditutup pada hari Jumaat dari 12.30 hingga 2.30 petang untuk solat. Waktu dan harga mungkin berubah, jadi semak sebelum berkunjung.","nav.explore":"Teroka","venue.eye":"Lokasi","venue.lede":"Kampus dengan arked putih, kubah keemasan dan halaman berpola bintang di Alor Setar, ibu negeri Kedah. AIU menyertai KIHC 2027 sebagai penganjur bersama dan tuan rumah.","tr.air":"Udara","tr.air.p":"Lapangan Terbang Sultan Abdul Halim (Alor Setar) untuk penerbangan domestik; Lapangan Terbang Antarabangsa Pulau Pinang untuk sambungan antarabangsa.","tr.rail":"Kereta api","tr.rail.p":"Perkhidmatan KTM ETS ke stesen Alor Setar.","tr.stay":"Penginapan","tr.stay.p":"Senarai hotel rakan dan kadar persidangan akan diterbitkan di sini.",
 "reg.eye":"Pendaftaran & yuran","reg.title":"Bersama kami di <em>Alor Setar</em>","reg.lede":"Terbuka kepada semua yang membentuk kesihatan komuniti, daripada klinisian dan doktor veterinar hingga perancang, penyelidik dan pemimpin komuniti.",
 "who.c":["Pakar perubatan kesihatan awam","Pegawai perubatan & pergigian","Ahli farmasi & kesihatan bersekutu","Pegawai veterinar","Pegawai kesihatan persekitaran","PBT & perancang bandar","Agensi pengurusan bencana","Ahli akademik & pelajar","NGO & pemimpin komuniti","Industri & pempamer","Rakan antarabangsa"],
 "fee.local":"Peserta Malaysia (RM)","fee.intl":"Peserta antarabangsa (USD)","fee.cat":"Kategori","fee.fee":"Yuran","fee.cond":"Syarat","cat.my":"Peserta Malaysia","cat.intl":"Peserta antarabangsa","cat.day":"Pendaftaran harian","cond.my":"Kadar awal atau standard akan disahkan selepas sebut harga tempat diterima","cond.intl":"Kadar tukaran dan kaedah pembayaran akan disahkan","cond.stu":"Kuota terhad dengan kad pelajar yang sah","cond.day":"Jika boleh dilaksanakan dan diluluskan","fee.eb":"Awal","fee.norm":"Biasa","fee.onsite":"Di tapak","fee.inc":"Yuran merangkumi kit persidangan, minum pagi/petang dan makan tengah hari kedua-dua hari, sijil penyertaan dan mata CPD.","fee.note":"<b>Yuran cadangan.</b> Kadar awal atau standard akan disahkan selepas sebut harga tempat diterima.",
@@ -971,7 +1009,7 @@ function applyLang(l){
   document.querySelectorAll("[data-i18n-html]").forEach(el=>{el.innerHTML=t(el.dataset.i18nHtml)});
   document.querySelectorAll("[data-chips]").forEach(el=>{const a=t(el.dataset.chips); if(Array.isArray(a)) el.innerHTML=a.map(x=>`<span>${esc(x)}</span>`).join("")});
   document.querySelectorAll(".lang button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.lang===l));
-  renderFees(); fillCats(); total(); renderTiers();
+  renderFees(); fillCats(); total(); renderTiers(); renderPlaces();
   document.querySelectorAll("[data-list]").forEach(el=>{const a=t(el.dataset.list); if(Array.isArray(a)) el.innerHTML=a.map(x=>`<li>${esc(x)}</li>`).join("")});
   try{localStorage.setItem("kihc-lang",l)}catch(e){}
 }
